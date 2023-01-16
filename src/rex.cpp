@@ -1,6 +1,12 @@
 #include "../header/rex.hpp"
 #include "../header/keyboard.hpp"
 #include "vec.hpp"
+#include <cmath>
+#include <iostream>
+
+float gravity = 1000.f;
+bool jmp = false;
+float last = MAXFLOAT;
 
 namespace project
 {
@@ -73,6 +79,33 @@ namespace project
         {
             changeAnim(Keyboard::Keys::VK_LEFT);
             move(-300 * dt, 0);
+        }
+
+        if(Keyboard::is_key_pressed(Keyboard::Keys::VK_SPACE))
+        {
+            changeAnim(Keyboard::Keys::VK_SPACE);
+            if(!jmp)
+            {
+                jmp = true;
+                last = currentFrame_->getPosition().y;
+            }
+            currentFrame_->move(0, (gravity * -1) * dt);
+        }
+        else
+        {
+            if(jmp)
+            {
+                currentFrame_->move(0, gravity * dt);
+            }
+
+            Vec pos = currentFrame_->getPosition();
+
+            if(last < pos.y)
+            {
+                currentFrame_->setPosition(pos.x, last);
+                last = MAXFLOAT;
+                jmp = false;
+            }
         }
 
         currentFrame_->update(dt);
